@@ -1,9 +1,9 @@
 # Projet Mini interpréteur - Théorie des langages de compilation
 
-@auteurs: Denisa Dudas & Camillia Hammou
-@classe: 3ESGI AL1
-@présoutenance: 23/01/2024
-@soutenance: 22/02/2024
+- auteurs: Denisa Dudas & Camillia Hammou
+- classe: 3ESGI AL1
+- présoutenance: 23/01/2024
+- soutenance: 22/02/2024
 
 ## Description
 Mini interpréteur avec AST contenant:
