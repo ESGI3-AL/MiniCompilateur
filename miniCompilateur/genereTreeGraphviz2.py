@@ -3,15 +3,26 @@
 Author : Vincent Genin ESGI-3AL 2018
 '''
 
-import uuid
+import os
 import graphviz as gv
+import uuid
+from datetime import datetime
 
 def printTreeGraph(t):
-    graph = gv.Digraph(format='pdf')
+    timestamp = datetime.now().strftime('%m-%d-%Y_%H:%M:%S')
+    filename = f'treeImages/Digraph.gv.{timestamp}'
+
+    graph = gv.Digraph(format='png')
     graph.attr('node', shape='circle')
     addNode(graph, t)
-    #graph.render(filename='img/graph') #Pour Sauvegarder
-    graph.view() #Pour afficher
+
+    treeImages = os.path.join(os.getcwd(), 'treeImages')
+
+    # Vérification si le dossier existe, sinon on le crée
+    if not os.path.exists(treeImages):
+        os.makedirs(treeImages)
+
+    graph.render(filename=filename, cleanup=True)
 
 def addNode(graph, t):
     myId = uuid.uuid4()
@@ -27,4 +38,4 @@ def addNode(graph, t):
 
     return myId
 
-printTreeGraph(('*', ('+', 4, 2), 3))
+#printTreeGraph(('*', ('+', 4, 2), 3), 'treeImages/graph')
