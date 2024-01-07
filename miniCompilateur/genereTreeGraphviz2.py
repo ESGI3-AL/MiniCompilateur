@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-'''
-Author : Vincent Genin ESGI-3AL 2018
-'''
-
 import os
 import graphviz as gv
 import uuid
