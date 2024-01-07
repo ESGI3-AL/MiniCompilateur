@@ -5,7 +5,7 @@
 #? @description: mini compilateur                                 #
 #******************************************************************
 
-from miniCompilateur.genereTreeGraphviz2 import printTreeGraph
+from genereTreeGraphviz2 import printTreeGraph
 import ply.lex as lex    #lexer
 import ply.yacc as yacc  #parser
 
@@ -22,7 +22,8 @@ reserved = {
 tokens = [
     'NAME','NUMBER',
     'PLUS','MINUS','TIMES','DIVIDE',
-    'LPAREN','RPAREN', 'LBRACE', 'RBRACE', 'COLON', 'AND', 'OR', 'EQUAL', 'EQUALS', 'LOWER','HIGHER'
+    'LPAREN','RPAREN', 'LBRACE', 'RBRACE', 'COLON', 'AND', 'OR', 'EQUAL', 'EQUALS', 'LOWER','HIGHER',
+    'WHILE', 'FOR'
     ]+list(reserved.values())  # ajout du dictionnaire
 
 # règle PLY pour reconnaître les identificateurs ou noms de variables
@@ -217,7 +218,7 @@ def p_error(t):
 # Build le parseur
 parser = yacc.yacc()
 
-result='print(1+2);x=4;x=x+1;'
+result='print(1+3);x=4;x=x+1;'
 
 # analyse et construit l'arbre syntaxique correspondant
 parser.parse(result)
