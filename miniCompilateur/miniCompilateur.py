@@ -9,26 +9,29 @@ from miniCompilateur.genereTreeGraphviz2 import printTreeGraph
 import ply.lex as lex    #lexer
 import ply.yacc as yacc  #parser
 
-#! Lexer
+#! Lexeur
 
+# dictionnaire
 reserved = {
-   'if' : 'IF',
+   'if' : 'IF',  # mot clé associé à une valeur
    'then' : 'THEN',
    'print' : 'PRINT'
    }
 
+# liste de tokens utilisée dans l'analyseur lexical
 tokens = [
     'NAME','NUMBER',
     'PLUS','MINUS','TIMES','DIVIDE',
-    'LPAREN','RPAREN', 'COLON', 'AND', 'OR', 'EQUAL', 'EQUALS', 'LOWER','HIGHER'
-    ]+list(reserved.values())
+    'LPAREN','RPAREN', 'LBRACE', 'RBRACE', 'COLON', 'AND', 'OR', 'EQUAL', 'EQUALS', 'LOWER','HIGHER'
+    ]+list(reserved.values())  # ajout du dictionnaire
 
-# Tokens
+# règle PLY pour reconnaître les identificateurs ou noms de variables
 def t_NAME(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value,'NAME')    # Check for reserved words
     return t
 
+# règle pour reconnaître certains symboles à l'aide de PLY
 t_PLUS    = r'\+'
 t_MINUS   = r'-'
 t_TIMES   = r'\*'
@@ -43,6 +46,7 @@ t_EQUALS  = r'=='
 t_LOWER  = r'\<'
 t_HIGHER  = r'\>'
 
+# règle pour reconnaître les nombres entiers
 def t_NUMBER(t):
     r'\d+'
     try:
@@ -52,23 +56,27 @@ def t_NUMBER(t):
         t.value = 0
     return t
 
-# Ignored characters
+# règle pour ignorer certains caractères
 t_ignore = " \t"
 
+# règle pour compter le nombre de nouvelles lignes
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += t.value.count("\n")
 
+# règle spéciale appelée par le lexer lorsqu'il rencontre un caractère qui ne correspond à aucune des règles définies
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
-    t.lexer.skip(1)
+    t.lexer.skip(1)  # passer au caractère suivant
 
-# Build the lexer
+# Build le lexeur
 lexer = lex.lex()
 
+#-----------------------------------------------------------------------------------------------------------------------
 
 #! Parsing rules
 
+# règle de production syntaxique pour le démarrage du parsing
 def p_start(t):
     ''' start : linst'''
     t[0] = ('start',t[1])
@@ -78,6 +86,7 @@ def p_start(t):
     evalInst(t[1])  # evaluation de l'arbre
 names={}
 
+#! evalInst
 def evalInst(t):
     print('evalInst', t)
     if t == "empty" : return
@@ -92,6 +101,7 @@ def evalInst(t):
         evalInst(t[1])
         evalInst(t[2])
 
+#! evalExpr
 def evalExpr(t):
     #print('eval de ',t, type(t), len(t))
     if type(t) is not tuple :
@@ -124,6 +134,7 @@ def evalExpr(t):
 
     return 'UNK'
 
+# définition de la structure syntaxique pour les blocs d'instructions
 def p_line(t):
     '''linst : linst inst
             | inst '''
@@ -133,16 +144,17 @@ def p_line(t):
         t[0] = ('bloc',t[1], 'empty')
 
 
-
+#! l’affectation et les variables dans les expressions
 def p_statement_assign(t):
     'inst : NAME EQUAL expression COLON'
     t[0] = ('assign',t[1], t[3])
 
+#! print
 def p_statement_print(t):
     'inst : PRINT LPAREN expression RPAREN COLON'
     t[0] = ('print',t[3])
 
-
+#! calcul d’expressions arithmétiques et booléennes
 def p_expression_binop(t):
     '''expression : expression PLUS expression
                   | expression MINUS expression
@@ -170,29 +182,42 @@ def p_expression_name(t):
 
     t[0] = t[1]
 
+#! fin calcul d’expressions arithmétiques et booléennes
+
 #! if
 def p_statement_if(t):
-    'inst : IF LPAREN expression RPAREN COLON lins'
+    'inst : IF LPAREN expression RPAREN LBRACE linst RBRACE'
 
+    # t[0] => construire le noeud (résultat)
+    # t[1] => if
+    # t[2] => paranthèse gauche
+    # t[3] => expression
+    # t[4] => paranthèse droite
+    # t[5] => accolade gauche
+    # t[6] => bloc d'intruction
+    # t[7] => accolade droite
     t[0] = ('if', t[3], t[6])
 
 #! while
 def p_statement_while(t):
-    'inst : WHILE LPAREN expression RPAREN COLON linst'
+    'inst : WHILE LPAREN expression RPAREN LBRACE linst RBRACE'
 
     t[0] = ('while', t[3], t[6])
 
+#! for
+def p_statement_for(t):
+    'inst : FOR LPAREN expression RPAREN LBRACE linst RBRACE'
+
+    t[0] = ('for', t[3], t[6])
+
+# règle spéciale pour la gestion d'erreur
 def p_error(t):
     print("Syntax error at '%s'" % t.value)
 
-# Build the parser
+# Build le parseur
 parser = yacc.yacc()
 
-#s='1+2;x=4 if ;x=x+1;'
-s='print(1+2);x=4;x=x+1;'
+result='print(1+2);x=4;x=x+1;'
 
-#with open("1.in") as file: # Use file to refer to the file object
-
-   #s = file.read()
-
-parser.parse(s)
+# analyse et construit l'arbre syntaxique correspondant
+parser.parse(result)
