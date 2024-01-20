@@ -18,6 +18,9 @@ reserved = {
     "print": "PRINT",
     "while": "WHILE",
     "for": "FOR",
+    "function": "FUNCTION",
+    "void": "VOID",
+
 }
 
 # liste de tokens utilisée dans l'analyseur lexical
@@ -159,8 +162,6 @@ def p_statement_assign(t):
         t[0] = ("=", t[1], (t[2][0], t[1], t[3]))
 
 
-
-
 #! print
 def p_statement_print(t):
     "inst : PRINT LPAREN expression RPAREN SEMICOLON"
@@ -251,32 +252,51 @@ def p_statement_for(t):
     t[0] = ("for", t[3], t[4], t[6], t[9])
 
 
+#! fonction void sans paramètres
+def p_void_function_without_params(t):
+    "inst : FUNCTION VOID ID LPAREN RPAREN LBRACE linst RBRACE"
+    t[0] = ("function", t[2], t[3], t[7])
+
+
+def p_function_call_without_params(t):
+    "inst : ID LPAREN RPAREN SEMICOLON"
+    t[0] = ("call", t[1])
+
+
 # règle spéciale pour la gestion d'erreur
 def p_error(t):
-    print(f"Syntax error at '{t.value}' {t.lineno}:{t.lexpos}")
+    if t is not None:
+        print(f"Syntax error at '{t.value}' {t.lineno}:{t.lexpos}")
+    else:
+        print("Syntax error: unexpected end of input")
 
 
 # Build le parseur
 parser = yacc.yacc()
 
-# affectation simples et print
+# -------------------affectation simples-------------------
 s1 = "var=hello; x=4; print(x);"
 
 s2 = "x=x+3; x=x-12; x=x*5; x=x/8;"
 
 s3 = "x+=9; x-=4; x*=10; x/=5; x--; x++;"
 
-# if/else
+# -------------------------if/else-------------------------
 s4 = "if(x<=6){print(x);}"
 
 s5 = "if(x>=7){print(True);} else {print(False);}"
 
-# boucles while, for
+# -------------------boucles while, for-------------------
 s6 = "while(x<30){x=x+3;print(x);}"
 
 s7 = """
 for (i=0; i<4; i=i+1;) {print(i*i);}
     """
 
+# ------------------------fonctions------------------------
+# fonction void sans paramètres
+s8 = "function void toto(){print(2);}toto();"
+
+
 # analyse et construit l'arbre syntaxique correspondant
-parser.parse(s7)
+parser.parse(s8)
