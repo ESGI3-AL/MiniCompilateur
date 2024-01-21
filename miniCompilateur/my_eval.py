@@ -9,8 +9,8 @@
 env = {}
 
 #! evaluation des instructions
-def evalInst(t):
-    print("evalInst", t)
+def evalInst(t, env):
+    #print("evalInst", t)
     if t == "empty":
         return
 
@@ -19,17 +19,18 @@ def evalInst(t):
         return
 
     if t[0] == "print":
-        print("CALC>", evalExpr(t[1]))
+        result = evalExpr(t[1], env)
+        print("CALC>", result)
 
     if t[0] == "assign":
         if type(t[2]) == tuple and t[2][0] == "Num":
-            env[t[1]] = evalExpr(t[2])
+            env[t[1]] = evalExpr(t[2], env)
         else:
             print("Warning_EvalInst : Unexpected assignment structure:", t)
 
-    if t[0] == "bloc":
-        evalInst(t[1])
-        evalInst(t[2])
+    if t[0] == "node":
+        evalInst(t[1], env)
+        evalInst(t[2], env)
 
     if t[0] == "assign_op":
         if t[2] == "++":
@@ -38,41 +39,41 @@ def evalInst(t):
             env[t[1]] -= 1
         else:
             if t[2] == "+=":
-                env[t[1]] += evalExpr(t[3])
+                env[t[1]] += evalExpr(t[3], env)
             elif t[2] == "-=":
-                env[t[1]] -= evalExpr(t[3])
+                env[t[1]] -= evalExpr(t[3], env)
             elif t[2] == "*=":
-                env[t[1]] *= evalExpr(t[3])
+                env[t[1]] *= evalExpr(t[3], env)
             elif t[2] == "/=":
-                env[t[1]] /= evalExpr(t[3])
+                env[t[1]] /= evalExpr(t[3], env)
 
     if t[0] == "while":
-        while evalExpr(t[1]):
-            evalInst(t[2])
+        while evalExpr(t[1], env):
+            evalInst(t[2], env)
 
     if t[0] == "for":
         evalInst(t[1])
-        while evalExpr(t[2]):
-            evalInst(t[4])
-            evalInst(t[3])
+        while evalExpr(t[2], env):
+            evalInst(t[4], env)
+            evalInst(t[3], env)
 
 
 #! evaluation des expressions
-def evalExpr(t):
+def evalExpr(t, env):
     # print('eval de ',t, type(t), len(t))
     if type(t) is not tuple:  # si ce n'est pas un tuple, c'est une feuille de l'arbre
         return t
 
     if t[0] == "START":
-        return evalExpr(t[1])
+        return evalExpr(t[1], env)
 
     if t[0] == "Num":
         return t[1]
 
     if t[0] == "Expr":
-        left_operand = evalExpr(t[1])
+        left_operand = evalExpr(t[1], env)
         operator = t[2]
-        right_operand = evalExpr(t[3])
+        right_operand = evalExpr(t[3], env)
 
         if operator == "+":
             return left_operand + right_operand

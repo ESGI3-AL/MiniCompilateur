@@ -13,4 +13,7 @@ env = {} # Stocker les variable dedans
 while True:
     line = input("CALC> ") # Recupérer l'entrée utilisateur
     ast = parser.parse(line)
-    evalInst(ast)
+    evalInst(ast, env)
+
+
+# arbre = representer un programme
