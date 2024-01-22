@@ -8,12 +8,9 @@
 from my_ast import parser
 from my_eval import evalInst
 
-env = {} # Stocker les variable dedans
+env = {}
 
 while True:
-    line = input("CALC> ") # Recupérer l'entrée utilisateur
+    line = input("CALC> ")
     ast = parser.parse(line)
     evalInst(ast, env)
-
-
-# arbre = representer un programme

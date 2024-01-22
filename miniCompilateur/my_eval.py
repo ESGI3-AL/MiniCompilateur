@@ -7,6 +7,10 @@
 # dictionnaire vide
 env = {}
 
+#stockage pour les fonctions
+functions = {}
+
+
 def evalExpr(t, env):
     print("- EvalExpr of", t)
 
@@ -118,6 +122,19 @@ def evalInst(t, env):
         while evalExpr(condition, env):
             evalInst(body, env)
             evalInst(update, env)
+
+    #définition d'une fonction
+    elif instruction_type == "function":
+        #extraire le nom de la fonction et le corps
+        _, return_type, func_name, body = t #- = on sais que c'est une fonction, return_type = void par ex, func_name = nom comme toto, body = instruction
+        if return_type == "void" and func_name not in functions:
+            functions[func_name] = body  #stocke le corps de la fonction dans le dico
+
+    #appel d'une fonction
+    elif instruction_type == "call":
+        func_name = args[0]
+        if func_name in functions:
+            evalInst(functions[func_name], env)#execute la fonction
 
     else:
         print("ERROR_EvalInst : Unexpected instruction type:", instruction_type)
