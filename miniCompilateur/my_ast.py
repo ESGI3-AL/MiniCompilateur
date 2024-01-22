@@ -284,10 +284,10 @@ s3 = "x+=9; x-=4; x*=10; x/=5; x--; x++;"
 # -------------------------if/else-------------------------
 s4 = "if(x<=6){print(x);}"
 
-s5 = "if(x>=7){print(True);} else {print(False);}"
+s5 = "if(x>=7){print(True);}else{print(False);}"
 
 # -------------------boucles while, for-------------------
-s6 = "while(x<30){x=x+3;print(x);}"
+s6 = "while(x<5){x=x+3;print(x);}"
 
 s7 = """
 for (i=0; i<4; i=i+1;) {print(i*i);}
