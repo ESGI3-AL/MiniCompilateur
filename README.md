@@ -7,43 +7,62 @@
 
 ## Description
 Mini interpréteur avec AST contenant:
+- noms de variables à plusieurs caractères
+- affectations
+- affichage d’expressions numériques
 - evalExpr et evalInst
-- IF, WHILE ET FOR
-- Fonctions :
-    - void sans paramètre
-    - void avec paramètre
-    - paramètres et return
-- Gestion du scope des variables
-- Récursivité terminale
-- Variables globales
+- instructions conditionnelles
+- structures itératives
+- affichage de l’arbre de syntaxe (sur la console et avec graphViz)
+
+- Bonus :
+    - Fonctions :
+        - void sans paramètre
+        - void avec paramètre
+    - Gestion des erreurs
+    - incrémentation, décrementation et affectations élargies : x++, x--, x+=1 ...
+    - affichage de l’arbre de syntaxe avec graphViz dans un dossier dedié
 
 ## Organisation projet
+- Structure du projet:
+    - dossier miniInterpreteur :
+        - dossier treeImages contenant l'affichage des arbres de syntaxe avec graphViz
+        - fichier generateTreeGraphviz2
+        - fichier my_ast contenant notre ast (parseur, lexeur)
+        - fichier my_eval contenant les evalInt et evalExpr
+        - fichier my_calc contenant la boucle principale du programme
+    - README.md
 
 ## Exemples d'utilisation
 
-- affectation, print -> miniInterpréteur.py
-s1='x=4;x=x+3;print(x);'
+-------------------affectation simples-------------------
+s1 = "var=hello; x=4; print(x);"
 
-- affectation élargie, affectation -> miniInterpréteur.py
-s2='x=9; x+=4; x++; print(x);'
+s2 = "x=x+3; x=x-12; x=x*5; x=x/8;"
 
-- while, for -> miniInterpréteur.py
-s3=’’’x=4;while(x<30){x=x+3;print(x);} ; for(i=0 ;i<4 ;i=i+1 ;){print(i*i) ;} ;’’’
+s3 = "x+=9; x-=4; x*=10; x/=5; x--; x++;"
 
-- fonctions void avec paramètres -> miniInterpréteur.py
-s4='fonctionVoid toto(a, b){print(a+b) ;} toto(3, 5) ;’
+-------------------------if/elseif/else-------------------------
+s4 = "if(x<=6){print(x);}"
 
-- fonctions value avec paramètres et return explicite -> miniInterpréteur.py
-s5='fonctionValue toto(a, b){c=a+b ;return c ;} toto(3, 5) ;’
+s5 = "if(x>=7){print(True);} else {print(False);}"
 
-- fonctions value avec paramètres et return implicite -> miniInterpréteur.py
-s5='fonctionValue toto(a, b){c=a+b ; toto=c ;} toto(3, 5) ;’
+s6 = "if(x>3){print(Bigger);} elseif(x<3){print(Smaller);} else{print(Equal);}"
 
-- fonctions value avec paramètres et return coupe circuit -> miniInterpréteur.py
-s6='fonctionValue toto(a, b){c=a+b ;return c ; print(666) ;} x=toto(3, 5) ; print(x) ;’
+-------------------boucles while, for-------------------
+s7 = "while(x<30){x=x+3;print(x);}"
 
-- fonctions value avec paramètres, return coupe circuit et scope des variables -> miniInterpréteur.py
-s7='fonctionValue toto(a, b){if(a==0) return b ; c=toto(a-1, b-1) ;return c ; print(666) ;} x=toto(3, 5) ; print(x) ;’
+s8 = """
+for (i=0; i<4; i=i+1;) {print(i*i);}
+    """
+
+------------------------fonctions------------------------
+fonction void sans paramètres
+s9 = "function void toto(){print(2);}toto();"
+
+fonction void avec paramètres
+s10 = "function void toto(x, y){print(x+y);}toto(2,3);"
+
 
 ### Informations
 - Python 3.11.6

@@ -131,7 +131,7 @@ def p_start(t):
     """start : linst"""
     t[0] = ("start", t[1])
     print(t[0])
-    printTreeGraph(t[0])
+    # printTreeGraph(t[0])  # à decommenté si besoin pour afficher l'arbre
     # eval(t[1])
     # evalInst(t[1])  # evaluation de l'arbre
 

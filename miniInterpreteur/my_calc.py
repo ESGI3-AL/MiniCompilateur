@@ -1,8 +1,8 @@
 
 # ******************************************************************
 # * @author: Denisa Dudas & Camillia Hammou                        *
-# * @date: 14/01/2024                                              *
-# * @description: fonctions evalInst et evalExpr                   *
+# * @date: 05/01/2024                                              *
+# * @description: Boucle pour evaluer les input utilisateur        *
 # ******************************************************************
 
 from my_ast import parser

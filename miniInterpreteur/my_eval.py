@@ -4,7 +4,7 @@
 # * @description: fonctions evalInst et evalExpr                   *
 # ******************************************************************
 
-# dictionnaire vide
+
 env = {}
 
 #stockage pour les fonctions
@@ -128,7 +128,7 @@ def evalInst(t, env):
         #extraire le nom de la fonction et le corps
         _, return_type, func_name, body = t #- = on sais que c'est une fonction, return_type = void par ex, func_name = nom comme toto, body = instruction
         if return_type == "void" and func_name not in functions:
-            functions[func_name] = body  #stocke le corps de la fonction dans le dico
+            functions[func_name] = body  #stocke le corps de la fonction
 
     #appel d'une fonction
     elif instruction_type == "call":
