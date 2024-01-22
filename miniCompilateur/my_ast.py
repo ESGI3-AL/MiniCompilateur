@@ -1,7 +1,7 @@
 
 # ******************************************************************
 # * @author: Denisa Dudas & Camillia Hammou                        *
-# * @date: 07/01/2024                                              *
+# * @date: 25/12/2023                                              *
 # * @description: mini compilateur                                 *
 # ******************************************************************
 
@@ -15,6 +15,7 @@ import ply.yacc as yacc  # parser
 reserved = {
     "if": "IF",  # mot clé associé à une valeur;
     "else": "ELSE",
+    "elseif": "ELSEIF",
     "print": "PRINT",
     "while": "WHILE",
     "for": "FOR",
@@ -44,6 +45,7 @@ tokens = [
     "LBRACE",
     "RBRACE",
     "SEMICOLON",
+    "COMMA",
     "AND",
     "OR",
     "EQUALS",
@@ -80,6 +82,7 @@ t_RPAREN = r"\)"
 t_LBRACE = r"\{"
 t_RBRACE = r"\}"
 t_SEMICOLON = r";"
+t_COMMA = r"\,"
 t_AND = r"\&\&"
 t_OR = r"\|\|"
 t_EQUALS = r"=="
@@ -231,6 +234,13 @@ def p_statement_if_else(t):
     t[0] = ("if_else", t[3], t[6], t[10])
 
 
+#! if, elseif, else
+def p_statement_if_elseif_else(t):
+    "inst : IF LPAREN expression RPAREN LBRACE linst RBRACE ELSEIF LPAREN expression RPAREN LBRACE linst RBRACE ELSE LBRACE linst RBRACE"
+
+    t[0] = ("if_elseif_else", t[3], t[6], t[10], t[13], t[17])
+
+
 #! while
 def p_statement_while(t):
     "inst : WHILE LPAREN expression RPAREN LBRACE linst RBRACE"
@@ -258,9 +268,39 @@ def p_void_function_without_params(t):
     t[0] = ("function", t[2], t[3], t[7])
 
 
+#! appel de fonction void sans paramètres
 def p_function_call_without_params(t):
     "inst : ID LPAREN RPAREN SEMICOLON"
     t[0] = ("call", t[1])
+
+
+#! fonction void avec paramètres
+def p_void_function_with_params(t):
+    "inst : FUNCTION VOID ID LPAREN params RPAREN LBRACE linst RBRACE"
+    t[0] = ("function", t[2], t[3], t[5], t[8])
+
+
+#! appel de fonction void avec paramètres
+def p_function_call_with_params(t):
+    "inst : ID LPAREN params RPAREN SEMICOLON"
+    t[0] = ("call", t[1], t[3])
+
+
+#! règles pour avoir des paramètres
+def p_params(t):
+    'params : param'
+    t[0] = [t[1]]
+
+
+def p_params_multiple(t):
+    'params : param COMMA params'
+    t[0] = [t[1]] + t[3]
+
+
+def p_param(t):
+    '''param : ID
+             | NUMBER'''
+    t[0] = t[1]
 
 
 # règle spéciale pour la gestion d'erreur
@@ -281,22 +321,27 @@ s2 = "x=x+3; x=x-12; x=x*5; x=x/8;"
 
 s3 = "x+=9; x-=4; x*=10; x/=5; x--; x++;"
 
-# -------------------------if/else-------------------------
+# -------------------------if/elseif/else-------------------------
 s4 = "if(x<=6){print(x);}"
 
-s5 = "if(x>=7){print(True);}else{print(False);}"
+s5 = "if(x>=7){print(True);} else {print(False);}"
+
+s6 = "if(x>3){print(Bigger);} elseif(x<3){print(Smaller);} else{print(Equal);}"
 
 # -------------------boucles while, for-------------------
-s6 = "while(x<5){x=x+3;print(x);}"
+s7 = "while(x<30){x=x+3;print(x);}"
 
-s7 = """
+s8 = """
 for (i=0; i<4; i=i+1;) {print(i*i);}
     """
 
 # ------------------------fonctions------------------------
 # fonction void sans paramètres
-s8 = "function void toto(){print(2);}toto();"
+s9 = "function void toto(){print(2);}toto();"
+
+# fonction void avec paramètres
+s10 = "function void toto(x, y){print(x+y);}toto(2,3);"
 
 
 # analyse et construit l'arbre syntaxique correspondant
-parser.parse(s8)
+parser.parse(s10)
