@@ -9,7 +9,11 @@ env = {}
 
 #stockage pour les fonctions
 functions = {}
+    # Stocker les fonctions avec paramètres dans un dictionnaire
+functions_with_params = {}
 
+# Stocker les fonctions sans paramètres dans un dictionnaire séparé
+functions_without_params = {}
 
 def evalExpr(t, env):
     print("- EvalExpr of", t)
@@ -123,18 +127,33 @@ def evalInst(t, env):
             evalInst(body, env)
             evalInst(update, env)
 
-    #définition d'une fonction
-    elif instruction_type == "function":
-        #extraire le nom de la fonction et le corps
-        _, return_type, func_name, body = t #- = on sais que c'est une fonction, return_type = void par ex, func_name = nom comme toto, body = instruction
-        if return_type == "void" and func_name not in functions:
-            functions[func_name] = body  #stocke le corps de la fonction
 
-    #appel d'une fonction
+    elif instruction_type == "function":
+        #on vérifie si la fonction a des paramètres
+        if len(args) == 4:
+            _, return_type, func_name, params, body = t
+            if return_type == "void":
+                functions_with_params[func_name] = {"params": params, "body": body}
+        elif len(args) == 3:
+            _, return_type, func_name, body = t
+            if return_type == "void":
+                functions_without_params[func_name] = {"body": body}
+
     elif instruction_type == "call":
-        func_name = args[0]
-        if func_name in functions:
-            evalInst(functions[func_name], env)#execute la fonction
+        func_name, *call_args = args #args = le nom de la fonction
+        if func_name in functions_with_params:
+            func_info = functions_with_params[func_name]
+            params = func_info.get("params",[])
+            func_body = func_info["body"]
+            if len(params) == len(call_args):
+                func_env = {param: evalExpr(arg, env) for param, arg in zip(params, call_args)}
+                evalInst(func_body, func_env)
+                #print("Reussi : Le nombre d'arguments correspond au nombre de paramètres de la fonction '{}'. Attendu : {}, Reçu : {}.".format(func_name, len(params), len(call_args)))
+            else:
+                print("Error: Number of arguments does not match number of function parameters '{}'. we want : {}, we have : {}.".format(func_name, len(params), len(call_args)))
+        elif func_name in functions_without_params:
+            func_body = functions_without_params[func_name]["body"]
+            evalInst(func_body, env)
 
     else:
         print("ERROR_EvalInst : Unexpected instruction type:", instruction_type)

@@ -339,8 +339,11 @@ for (i=0; i<4; i=i+1;) {print(i*i);}
 # fonction void sans paramètres
 s9 = "function void toto(){print(2);}toto();"
 
-# fonction void avec paramètres
+# fonction void avec 2 paramètres
 s10 = "function void toto(x, y){print(x+y);}toto(2,3);"
+
+# fonction void avec 1 paramètres
+s11 = "function void toto(x){print(x);}toto(2);"
 
 
 # analyse et construit l'arbre syntaxique correspondant
