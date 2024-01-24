@@ -17,6 +17,7 @@ reserved = {
     "else": "ELSE",
     "elseif": "ELSEIF",
     "print": "PRINT",
+    "printString": "PRINTSTRING",
     "while": "WHILE",
     "for": "FOR",
     "function": "FUNCTION",
@@ -52,6 +53,7 @@ tokens = [
     "EQUAL",
     "LOWER",
     "HIGHER",
+    "STRING",
 ] + list(
     reserved.values() # ajout du dictionnaire
 )
@@ -89,6 +91,7 @@ t_EQUALS = r"=="
 t_EQUAL = r"="
 t_LOWER = r"\<"
 t_HIGHER = r"\>"
+t_STRING = r'"[^"]*"'
 
 
 # règle pour reconnaître les nombres entiers
@@ -165,10 +168,38 @@ def p_statement_assign(t):
         t[0] = ("=", t[1], (t[2][0], t[1], t[3]))
 
 
-#! print
 def p_statement_print(t):
-    "inst : PRINT LPAREN expression RPAREN SEMICOLON"
-    t[0] = ("print", t[3])
+    """inst : PRINT LPAREN string RPAREN SEMICOLON
+            | PRINT LPAREN ID RPAREN SEMICOLON"""
+    t[0] = ("printString", t[3])
+
+#! Règle pour l'impression multiple
+def p_statement_print_multiple(t):
+    "inst : PRINT LPAREN expr_list RPAREN SEMICOLON"
+    t[0] = ("printmultiple", t[3])
+
+#! printString
+def p_statement_print_string(t):
+    "inst : PRINTSTRING LPAREN STRING RPAREN SEMICOLON"
+    t[0] = ("printString", t[3])
+
+# Règle pour une chaîne de caractères
+def p_string(t):
+    """
+    string : STRING
+    """
+    t[0] = t[1]
+
+# Règle pour une liste d'expressions
+def p_expr_list(t):
+    """
+    expr_list : expression
+              | expr_list COMMA expression
+    """
+    if len(t) == 2:  # Un seul élément
+        t[0] = [t[1]]
+    else:  # Plusieurs éléments
+        t[0] = t[1] + [t[3]]
 
 
 #! calcul d’expressions arithmétiques et booléennes
@@ -345,6 +376,8 @@ s10 = "function void toto(x, y){print(x+y);}toto(2,3);"
 # fonction void avec 1 paramètres
 s11 = "function void toto(x){print(x);}toto(2);"
 
+# fonction void avec 3 paramètres
+s11 = "function void toto(x,y,z){print(x+y+z);}toto(1,2,3);"
 
 # analyse et construit l'arbre syntaxique correspondant
 parser.parse(s10)

@@ -89,7 +89,67 @@ def evalInst(t, env):
             evalInst(inst, env)
 
     elif instruction_type == "print":
-        print("- CALC>", evalExpr(args[0], env))
+    # Assurez-vous que 'args' est une liste d'expressions à imprimer
+        if not isinstance(args, list):
+            args = [args]
+
+        results = []
+        for expr in args:
+            if isinstance(expr, str):
+                # Vérifiez si 'expr' est un identifiant de variable ou une chaîne littérale
+                if expr in env:
+                    # Si 'expr' est un identifiant de variable, évaluez-le pour obtenir sa valeur
+                    evaluated_expr = evalExpr(expr, env)
+                    results.append(evaluated_expr)
+                else:
+                    # Sinon, traitez-le comme une chaîne littérale
+                    results.append(expr.strip('"'))
+            elif isinstance(expr, tuple):
+                # Si 'expr' est un tuple, évaluez l'expression
+                evaluated_expr = evalExpr(expr, env)
+                results.append(evaluated_expr)
+            else:
+                results.append(expr)
+        print("- CALC> ", ", ".join(map(str, results)))
+
+
+
+    elif instruction_type == "printmultiple":
+        results = []
+        for expr in args[0]:
+            if isinstance(expr, tuple):
+                # Si l'expression est un tuple, évaluez l'expression
+                evaluated_expr = evalExpr(expr, env)
+                results.append(evaluated_expr)
+            elif isinstance(expr, str):
+                # Si l'expression est une chaîne, vérifiez si c'est une variable ou une chaîne littérale
+                if expr in env:
+                    # Si c'est un identifiant de variable, évaluez-le pour obtenir sa valeur
+                    evaluated_expr = evalExpr(expr, env)
+                    results.append(evaluated_expr)
+                else:
+                    # Sinon, traitez-le comme une chaîne littérale
+                    results.append(expr.strip('"'))
+            else:
+                # Pour d'autres types de données, ajoutez-les directement aux résultats
+                results.append(expr)
+        print("- MULTIPLE CALC> ", ", ".join(map(str, results)))
+
+
+    elif instruction_type == "printString":
+        string_to_print = args[0]
+        if isinstance(string_to_print, str):
+            # Si c'est un identifiant de variable, évaluez-le
+            if string_to_print in env:
+                evaluated_expr = evalExpr(string_to_print, env)
+                print("- PRINTSTRING> " + str(evaluated_expr))
+            else:
+                # Sinon, imprimez la chaîne telle quelle
+                print("- PRINTSTRING> " + string_to_print)
+
+
+
+
 
     elif instruction_type == "assign":
         var_name, var_expr = args
@@ -129,31 +189,29 @@ def evalInst(t, env):
 
 
     elif instruction_type == "function":
-        #on vérifie si la fonction a des paramètres
-        if len(args) == 4:
-            _, return_type, func_name, params, body = t
-            if return_type == "void":
-                functions_with_params[func_name] = {"params": params, "body": body}
-        elif len(args) == 3:
-            _, return_type, func_name, body = t
-            if return_type == "void":
-                functions_without_params[func_name] = {"body": body}
+        _, return_type, func_name, *func_body = t
+        if return_type == "void":
+            if len(func_body) == 2:  # La fonction a des paramètres
+                params, body = func_body
+            else:  # La fonction n'a pas de paramètres
+                params, body = [], func_body[0]
+            functions[func_name] = {"params": params, "body": body}
 
     elif instruction_type == "call":
-        func_name, *call_args = args #args = le nom de la fonction
-        if func_name in functions_with_params:
-            func_info = functions_with_params[func_name]
-            params = func_info.get("params",[])
+        func_name = args[0]
+        call_args = args[1] if len(args) > 1 else []  # Gérer les appels sans arguments
+        if func_name in functions:
+            func_info = functions[func_name]
+            params = func_info["params"]
             func_body = func_info["body"]
             if len(params) == len(call_args):
-                func_env = {param: evalExpr(arg, env) for param, arg in zip(params, call_args)}
+                func_env = {param: evalExpr(arg, env) for param, arg in zip(params, call_args)} if call_args else {}
                 evalInst(func_body, func_env)
-                #print("Reussi : Le nombre d'arguments correspond au nombre de paramètres de la fonction '{}'. Attendu : {}, Reçu : {}.".format(func_name, len(params), len(call_args)))
             else:
-                print("Error: Number of arguments does not match number of function parameters '{}'. we want : {}, we have : {}.".format(func_name, len(params), len(call_args)))
-        elif func_name in functions_without_params:
-            func_body = functions_without_params[func_name]["body"]
-            evalInst(func_body, env)
+                print("Error: Number of arguments does not match number of function parameters '{}'. Expected: {}, Received: {}.".format(func_name, len(params), len(call_args)))
+
+
+               # print("Error: Number of arguments does not match number of function parameters '{}'. Expected: {}, Received: {}.".format(func_name, len(params), len(call_args)))
 
     else:
         print("ERROR_EvalInst : Unexpected instruction type:", instruction_type)
