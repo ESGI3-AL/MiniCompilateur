@@ -129,7 +129,7 @@ lexer = lex.lex()
 #! Parsing rules
 
 
-# règle de production syntaxique pour le démarrage du parsing
+#! règle de production syntaxique pour le démarrage du parsing
 def p_start(t):
     """start : linst"""
     t[0] = ("start", t[1])
@@ -139,7 +139,7 @@ def p_start(t):
     # evalInst(t[1])  # evaluation de l'arbre
 
 
-# définition de la structure syntaxique pour les blocs d'instructions
+#! définition de la structure syntaxique pour les blocs d'instructions
 def p_line(t):
     """linst : linst inst
              | inst"""  # linst peut etre une séquence de deux elements ou une seule instruction
@@ -183,14 +183,14 @@ def p_statement_print_string(t):
     "inst : PRINTSTRING LPAREN STRING RPAREN SEMICOLON"
     t[0] = ("printString", t[3])
 
-# Règle pour une chaîne de caractères
+#! Règle pour une chaîne de caractères
 def p_string(t):
     """
     string : STRING
     """
     t[0] = t[1]
 
-# Règle pour une liste d'expressions
+#! Règle pour une liste d'expressions
 def p_expr_list(t):
     """
     expr_list : expression
@@ -377,7 +377,17 @@ s10 = "function void toto(x, y){print(x+y);}toto(2,3);"
 s11 = "function void toto(x){print(x);}toto(2);"
 
 # fonction void avec 3 paramètres
-s11 = "function void toto(x,y,z){print(x+y+z);}toto(1,2,3);"
+s12 = "function void toto(x,y,z){print(x+y+z);}toto(1,2,3);"
+
+# ------------------------Print------------------------
+#Print
+s13 = "print(2);"
+
+#print multiple
+s14 = "print(1+5,2,3);"
+
+#printString (à écrire directement dans la console)
+
 
 # analyse et construit l'arbre syntaxique correspondant
 parser.parse(s10)
