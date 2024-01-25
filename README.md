@@ -22,6 +22,8 @@ Mini interpréteur avec AST contenant:
     - Gestion des erreurs
     - incrémentation, décrementation et affectations élargies : x++, x--, x+=1 ...
     - affichage de l’arbre de syntaxe avec graphViz dans un dossier dedié
+    -PrintMultiples
+    -PrintString
 
 ## Organisation projet
 - Structure du projet:
