@@ -59,11 +59,20 @@ for (i=0; i<4; i=i+1;) {print(i*i);}
     """
 
 ------------------------fonctions------------------------
-fonction void sans paramètres
 s9 = "function void toto(){print(2);}toto();"
 
-fonction void avec paramètres
 s10 = "function void toto(x, y){print(x+y);}toto(2,3);"
+
+s11 = "function void toto(x){print(x);}toto(2);"
+
+s12 = "function void toto(x,y,z){print(x+y+z);}toto(1,2,3);"
+
+------------------------Print------------------------
+s13 = "print(2);"
+
+s14 = "print(1+5,2,3);"
+
+s15 = "print("hello");"
 
 
 ### Informations
