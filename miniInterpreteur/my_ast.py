@@ -329,8 +329,7 @@ def p_params_multiple(t):
 
 
 def p_param(t):
-    '''param : ID
-             | NUMBER'''
+    '''param : expression'''
     t[0] = t[1]
 
 
