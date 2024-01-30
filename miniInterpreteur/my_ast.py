@@ -22,7 +22,8 @@ reserved = {
     "for": "FOR",
     "function": "FUNCTION",
     "void": "VOID",
-
+    "value": "VALUE",
+    "return": "RETURN",
 }
 
 # liste de tokens utilisée dans l'analyseur lexical
@@ -134,7 +135,7 @@ def p_start(t):
     """start : linst"""
     t[0] = ("start", t[1])
     print(t[0])
-    # printTreeGraph(t[0])  # à decommenté si besoin pour afficher l'arbre
+    printTreeGraph(t[0])  # à decommenté si besoin pour afficher l'arbre
     # eval(t[1])
     # evalInst(t[1])  # evaluation de l'arbre
 
@@ -173,15 +174,18 @@ def p_statement_print(t):
             | PRINT LPAREN ID RPAREN SEMICOLON"""
     t[0] = ("printString", t[3])
 
+
 #! Règle pour l'impression multiple
 def p_statement_print_multiple(t):
     "inst : PRINT LPAREN expr_list RPAREN SEMICOLON"
     t[0] = ("printmultiple", t[3])
 
+
 #! printString
 def p_statement_print_string(t):
     "inst : PRINTSTRING LPAREN STRING RPAREN SEMICOLON"
     t[0] = ("printString", t[3])
+
 
 #! Règle pour une chaîne de caractères
 def p_string(t):
@@ -189,6 +193,7 @@ def p_string(t):
     string : STRING
     """
     t[0] = t[1]
+
 
 #! Règle pour une liste d'expressions
 def p_expr_list(t):
@@ -333,6 +338,24 @@ def p_param(t):
     t[0] = t[1]
 
 
+#! fonction value sans paramètres et return
+def p_function_value_without_params(t):
+    "inst : FUNCTION VALUE ID LPAREN RPAREN LBRACE linst return_statement RBRACE"
+    t[0] = ("function", t[2], t[3], t[7], t[8])
+
+
+#! fonction value avec paramètres et return
+def p_function_value_with_params(t):
+    "inst : FUNCTION VALUE ID LPAREN params RPAREN LBRACE linst return_statement RBRACE"
+    t[0] = ("function", t[2], t[3], t[5], t[8], t[9])
+
+
+#! règle pour gérer le return
+def p_return_statement(t):
+    "return_statement : RETURN expression SEMICOLON"
+    t[0] = ("return", t[2])
+
+
 # règle spéciale pour la gestion d'erreur
 def p_error(t):
     if t is not None:
@@ -378,15 +401,21 @@ s11 = "function void toto(x){print(x);}toto(2);"
 # fonction void avec 3 paramètres
 s12 = "function void toto(x,y,z){print(x+y+z);}toto(1,2,3);"
 
+# fonction value sans paramètres et return
+s13 = "function value toto(){x=5; return x;}toto();"
+
+# fonction value avec paramètres et return
+s14 = "function value toto(a,b){c=a+b ; return c;} toto(3, 5);"
+
+
 # ------------------------Print------------------------
 #Print
-s13 = "print(2);"
+#s15 = "print(2);"
 
 #print multiple
-s14 = "print(1+5,2,3);"
+#s16 = "print(1+5,2,3);"
 
 #printString (à écrire directement dans la console)
 
-
 # analyse et construit l'arbre syntaxique correspondant
-parser.parse(s10)
+parser.parse(s13)
