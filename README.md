@@ -37,45 +37,70 @@ Mini interpréteur avec AST contenant:
 
 ## Exemples d'utilisation
 
--------------------affectation simples-------------------
+
+### Affectation simples :
+
 s1 = "var=hello; x=4; print(x);"
 
 s2 = "x=x+3; x=x-12; x=x*5; x=x/8;"
 
 s3 = "x+=9; x-=4; x*=10; x/=5; x--; x++;"
 
--------------------------if/elseif/else-------------------------
+
+### If/elseif/else :
 s4 = "if(x<=6){print(x);}"
 
 s5 = "if(x>=7){print(True);} else {print(False);}"
 
 s6 = "if(x>3){print(Bigger);} elseif(x<3){print(Smaller);} else{print(Equal);}"
 
--------------------boucles while, for-------------------
+
+### Boucles while, for :
 s7 = "while(x<30){x=x+3;print(x);}"
 
 s8 = """
 for (i=0; i<4; i=i+1;) {print(i*i);}
     """
 
-------------------------fonctions------------------------
-s9 = "function void toto(){print(2);}toto();"
 
-s10 = "function void toto(x, y){print(x+y);}toto(2,3);"
+### Print :
+Print :
+s9 = "print(2);"
 
-s11 = "function void toto(x){print(x);}toto(2);"
-
-s12 = "function void toto(x,y,z){print(x+y+z);}toto(1,2,3);"
-
-------------------------Print------------------------
-s13 = "print(2);"
-
-s14 = "print(1+5,2,3);"
-
-s15 = "print("hello");"
+Print multiple:
+s10 = "print(1+5,2,3);"
 
 
-### Informations
+## Fonctions :
+### fonction void sans paramètres :
+s11 = "function void toto(){print(2);}toto();"
+
+### fonction void avec 2 paramètres :
+s12 = "function void toto(x, y){print(x+y);}toto(2,3);"
+
+### fonction void avec 1 paramètres :
+s13 = "function void toto(x){print(x);}toto(2);"
+
+### fonction void avec 3 paramètres :
+s14 = "function void toto(x,y,z){print(x+y+z);}toto(1,2,3);"
+
+### fonction value sans paramètres et return :
+s15 = "function value toto(){x=5; return x;}toto();"
+
+### fonction value avec paramètres et return :
+s16 = "function value toto(a,b){c=a+b ; return c;} toto(3, 5);"
+
+## Tableaux :
+s17 = "array tab[];"
+
+s18 = "array tab[5, 2, 1];"
+
+s19 = "tab[0];"
+
+s20 = "tab[0] = 5;"
+
+---
+## Informations Utiles
 - Python 3.11.6
 - ply, graphviz
 - visual studio code
