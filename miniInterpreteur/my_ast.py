@@ -24,6 +24,7 @@ reserved = {
     "void": "VOID",
     "value": "VALUE",
     "return": "RETURN",
+    "array": "ARRAY",
 }
 
 # liste de tokens utilisée dans l'analyseur lexical
@@ -46,6 +47,8 @@ tokens = [
     "RPAREN",
     "LBRACE",
     "RBRACE",
+    "LBRACKET",
+    "RBRACKET",
     "SEMICOLON",
     "COMMA",
     "AND",
@@ -84,6 +87,8 @@ t_LPAREN = r"\("
 t_RPAREN = r"\)"
 t_LBRACE = r"\{"
 t_RBRACE = r"\}"
+t_LBRACKET = r"\["
+t_RBRACKET = r"\]"
 t_SEMICOLON = r";"
 t_COMMA = r"\,"
 t_AND = r"\&\&"
@@ -336,7 +341,7 @@ def p_params_multiple(t):
 def p_param(t):
     '''param : expression'''
     t[0] = t[1]
-
+#!-----------------------------------
 
 #! fonction value sans paramètres et return
 def p_function_value_without_params(t):
@@ -356,6 +361,36 @@ def p_return_statement(t):
     t[0] = ("return", t[2])
 
 
+#! règle pour déclarer un tableau vide
+def p_empty_array_declaration(t):
+    "inst : ARRAY ID LBRACKET RBRACKET SEMICOLON"
+    t[0] = ("array", t[2], [])
+
+
+#! règle pour déclarer un tableau
+def p_array_declaration_single_element(t):
+    "inst : ARRAY ID LBRACKET expression RBRACKET SEMICOLON"
+    t[0] = ("array", t[2], t[4])
+
+
+#! règle pour déclarer un tableau avec plusieurs éléments
+def p_array_declaration_multiple_elements(t):
+    "inst : ARRAY ID LBRACKET expr_list RBRACKET SEMICOLON"
+    t[0] = ("array", t[2], t[4])
+
+
+#! règle pour accéder à un élément du tableau
+def p_array_access(t):
+    "inst : ID LBRACKET expression RBRACKET SEMICOLON"
+    t[0] = ("array_access", t[1], t[3])
+
+
+#! règle pour modifier un élément du tableau
+def p_array_assignment(t):
+    "inst : ID LBRACKET expression RBRACKET EQUAL expression SEMICOLON"
+    t[0] = ("array_assignment", t[1], t[3], t[6])
+
+
 # règle spéciale pour la gestion d'erreur
 def p_error(t):
     if t is not None:
@@ -367,55 +402,34 @@ def p_error(t):
 # Build le parseur
 parser = yacc.yacc()
 
-# -------------------affectation simples-------------------
-s1 = "var=hello; x=4; print(x);"
-
-s2 = "x=x+3; x=x-12; x=x*5; x=x/8;"
-
-s3 = "x+=9; x-=4; x*=10; x/=5; x--; x++;"
-
-# -------------------------if/elseif/else-------------------------
-s4 = "if(x<=6){print(x);}"
-
-s5 = "if(x>=7){print(True);} else {print(False);}"
-
-s6 = "if(x>3){print(Bigger);} elseif(x<3){print(Smaller);} else{print(Equal);}"
-
-# -------------------boucles while, for-------------------
-s7 = "while(x<30){x=x+3;print(x);}"
-
-s8 = """
-for (i=0; i<4; i=i+1;) {print(i*i);}
-    """
-
-# ------------------------fonctions------------------------
+# ----------------------- fonctions ----------------------------------
 # fonction void sans paramètres
-s9 = "function void toto(){print(2);}toto();"
+s11 = "function void toto(){print(2);}toto();"
 
 # fonction void avec 2 paramètres
-s10 = "function void toto(x, y){print(x+y);}toto(2,3);"
+s12 = "function void toto(x, y){print(x+y);}toto(2,3);"
 
 # fonction void avec 1 paramètres
-s11 = "function void toto(x){print(x);}toto(2);"
+s13 = "function void toto(x){print(x);}toto(2);"
 
 # fonction void avec 3 paramètres
-s12 = "function void toto(x,y,z){print(x+y+z);}toto(1,2,3);"
+s14 = "function void toto(x,y,z){print(x+y+z);}toto(1,2,3);"
 
 # fonction value sans paramètres et return
-s13 = "function value toto(){x=5; return x;}toto();"
+s15 = "function value toto(){x=5; return x;}toto();"
 
 # fonction value avec paramètres et return
-s14 = "function value toto(a,b){c=a+b ; return c;} toto(3, 5);"
+s16 = "function value toto(a,b){c=a+b ; return c;} toto(3, 5);"
 
+# ----------------------- tableaux ----------------------------------
+s17 = "array tab[];"
 
-# ------------------------Print------------------------
-#Print
-#s15 = "print(2);"
+s18 = "array tab[5, 2, 1];"
 
-#print multiple
-#s16 = "print(1+5,2,3);"
+s19 = "tab[0];"
 
-#printString (à écrire directement dans la console)
+s20 = "tab[0] = 5;"
+
 
 # analyse et construit l'arbre syntaxique correspondant
-parser.parse(s13)
+parser.parse(s20)
