@@ -50,6 +50,9 @@ def evalExpr(t, env):
         elif operator == "*=": env[var_name] = env.get(var_name, 0) * new_value
         elif operator == "/=": env[var_name] = env.get(var_name, 0) / new_value
         return env[var_name]
+    
+    elif operator == "return":
+        return evalExpr(t[1], env)
 
     else:
         print("Unexpected expression structure or operator:", t)
@@ -176,22 +179,35 @@ def evalInst(t, env):
     elif instruction_type == "function":
         _, return_type, func_name, *func_body = t
         if return_type == "void":
-            if len(func_body) == 2:#function = avec paramètres
+            if len(func_body) == 2:  # function avec paramètres
                 params, body = func_body
-            else:#function = pas de param
+            else:  # function sans param
                 params, body = [], func_body[0]
-            functions[func_name] = {"params": params, "body": body}
+        elif return_type == "value":
+            if len(func_body) == 3:  # function avec paramètres
+                params, body, return_expr = func_body
+            else:  # function sans param
+                params, body, return_expr = [], func_body[0], func_body[1]
+        else:
+            print("ERROR_EvalInst : Unexpected function return type:", return_type)
+            return
+        functions[func_name] = {"params": params, "body": body, "return": return_expr if return_type == "value" else None}
 
     elif instruction_type == "call":
         func_name = args[0]
-        call_args = args[1] if len(args) > 1 else []#appel sans arguments
+        call_args = args[1] if len(args) > 1 else []  # appel sans arguments
         if func_name in functions:
             func_info = functions[func_name]
             params = func_info["params"]
             func_body = func_info["body"]
+            return_expr = func_info.get("return")
             if len(params) == len(call_args):
                 func_env = {param: evalExpr(arg, env) for param, arg in zip(params, call_args)} if call_args else {}
                 evalInst(func_body, func_env)
+                if return_expr:
+                    return_value = evalExpr(return_expr, func_env)  # Use func_env here
+                    print(f"- Function '{func_name}' returned: {return_value}")
+                    return return_value
             else:
                 print("Error: Number of arguments does not match number of function parameters '{}'. Expected: {}, Received: {}.".format(func_name, len(params), len(call_args)))
     else:
