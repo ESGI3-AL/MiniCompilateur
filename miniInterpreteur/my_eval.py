@@ -10,6 +10,8 @@ env = {}
 #stockage pour les fonctions
 functions = {}
 
+
+#--------------------------------------------pour évaluer des variables----------------------------------------------------------------------------------#
 def eval_variable(t, env):
     if t == "True":
         return True
@@ -17,9 +19,11 @@ def eval_variable(t, env):
         return False
     return env.get(t, 0)
 
+#--------------------------------------------pour évaluer des littéraux----------------------------------------------------------------------------------#
 def eval_literal(t):
     return t
 
+#--------------------------------------------pour évaluer des opérateurs----------------------------------------------------------------------------------#
 def eval_arithmetic_operator(operator, left_operand, right_operand):
     if operator == '+':
         return left_operand + right_operand
@@ -30,6 +34,7 @@ def eval_arithmetic_operator(operator, left_operand, right_operand):
     elif operator == '/':
         return left_operand / right_operand
 
+#--------------------------------------------pour évaluer des opérateurs logiques----------------------------------------------------------------------------------#
 def eval_logical_operator(operator, left_operand, right_operand):
     if operator == 'AND':
         return left_operand and right_operand
@@ -48,6 +53,7 @@ def eval_logical_operator(operator, left_operand, right_operand):
     elif operator == '!=':
         return left_operand != right_operand
 
+#--------------------------------------------pour évaluer des expressions----------------------------------------------------------------------------------#    
 def evalExpr(t, env):
     print("- EvalExpr of", t)
 
@@ -87,7 +93,8 @@ def evalExpr(t, env):
         print("Unexpected expression structure or operator:", t)
         return "UNKNOWN"
 
-#pour évaluer des instructions (assignation, boucles, conditions)
+#--------------------------------------------pour évaluer des instructions (assignation, boucles, conditions)----------------------------------------------------------------------------------#
+
 def evalInst(t, env):
     if t == "empty":
         return
