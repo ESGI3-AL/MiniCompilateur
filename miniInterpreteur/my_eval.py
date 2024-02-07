@@ -10,45 +10,80 @@ env = {}
 #stockage pour les fonctions
 functions = {}
 
+
+#--------------------------------------------pour évaluer des variables----------------------------------------------------------------------------------#
+def eval_variable(t, env):
+    if t == "True":
+        return True
+    elif t == "False":
+        return False
+    return env.get(t, 0)
+
+#--------------------------------------------pour évaluer des littéraux----------------------------------------------------------------------------------#
+def eval_literal(t):
+    return t
+
+#--------------------------------------------pour évaluer des opérateurs----------------------------------------------------------------------------------#
+def eval_arithmetic_operator(operator, left_operand, right_operand):
+    if operator == '+':
+        return left_operand + right_operand
+    elif operator == '-':
+        return left_operand - right_operand
+    elif operator == '*':
+        return left_operand * right_operand
+    elif operator == '/':
+        return left_operand / right_operand
+
+#--------------------------------------------pour évaluer des opérateurs logiques----------------------------------------------------------------------------------#
+def eval_logical_operator(operator, left_operand, right_operand):
+    if operator == 'AND':
+        return left_operand and right_operand
+    elif operator == 'OR':
+        return left_operand or right_operand
+    elif operator == '==':
+        return left_operand == right_operand
+    elif operator == '<':
+        return left_operand < right_operand
+    elif operator == '>':
+        return left_operand > right_operand
+    elif operator == '<=':
+        return left_operand <= right_operand
+    elif operator == '>=':
+        return left_operand >= right_operand
+    elif operator == '!=':
+        return left_operand != right_operand
+
+#--------------------------------------------pour évaluer des expressions----------------------------------------------------------------------------------#    
 def evalExpr(t, env):
     print("- EvalExpr of", t)
 
-    #si expression n'est pas un tuple, elle est pas un opérateur
-    if type(t) is not tuple:
-        if isinstance(t, str):  #on gere les variables et les boolean
-            if t == "True": return True
-            elif t == "False": return False
-            return env.get(t, 0)  # Retourne la valeur de la variable ou 0 si non trouvé
-        return t  #Si pas variable alors c'est une valeur littérale (ex: nombre)
+    if not isinstance(t, tuple):
+        return eval_variable(t, env) if isinstance(t, str) else eval_literal(t)
 
-    #si tuple, elle possède un opérateur
     operator = t[0]
-    #on  gère les opérateurs arithmétiques et logiques
     if operator in ['+', '-', '*', '/', 'AND', 'OR', '==', '<', '>', '<=', '>=', '!=']:
         left_operand = evalExpr(t[1], env)
         right_operand = evalExpr(t[2], env)
 
-        if operator == '+': return left_operand + right_operand
-        elif operator == '-': return left_operand - right_operand
-        elif operator == '*': return left_operand * right_operand
-        elif operator == '/': return left_operand / right_operand
-        elif operator == 'AND': return left_operand and right_operand
-        elif operator == 'OR': return left_operand or right_operand
-        elif operator == '==': return left_operand == right_operand
-        elif operator == '<': return left_operand < right_operand
-        elif operator == '>': return left_operand > right_operand
-        elif operator == '<=': return left_operand <= right_operand
-        elif operator == '>=': return left_operand >= right_operand
-        elif operator == '!=': return left_operand != right_operand
-
-    # Gestion des opérations d'assignation composées
+        if operator in ['+', '-', '*', '/']:
+            return eval_arithmetic_operator(operator, left_operand, right_operand)
+        else:
+            return eval_logical_operator(operator, left_operand, right_operand)
+    
     elif operator in ["+=", "-=", "*=", "/="] and isinstance(t[1], str):
         var_name = t[1]
         new_value = evalExpr(t[2], env)
-        if operator == "+=": env[var_name] = env.get(var_name, 0) + new_value
-        elif operator == "-=": env[var_name] = env.get(var_name, 0) - new_value
-        elif operator == "*=": env[var_name] = env.get(var_name, 0) * new_value
-        elif operator == "/=": env[var_name] = env.get(var_name, 0) / new_value
+        current_value = env.get(var_name, 0)
+
+        if operator == "+=":
+            env[var_name] = current_value + new_value
+        elif operator == "-=":
+            env[var_name] = current_value - new_value
+        elif operator == "*=":
+            env[var_name] = current_value * new_value
+        elif operator == "/=":
+            env[var_name] = current_value / new_value
+
         return env[var_name]
     
     elif operator == "return":
@@ -58,8 +93,8 @@ def evalExpr(t, env):
         print("Unexpected expression structure or operator:", t)
         return "UNKNOWN"
 
+#--------------------------------------------pour évaluer des instructions (assignation, boucles, conditions)----------------------------------------------------------------------------------#
 
-#pour évaluer des instructions (assignation, boucles, conditions)
 def evalInst(t, env):
     if t == "empty":
         return
