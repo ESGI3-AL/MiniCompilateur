@@ -5,10 +5,47 @@
 # ******************************************************************
 
 
+execution_stack = []
+
 env = {}
 
-#stockage pour les fonctions
 functions = {}
+
+#--------ajouter un scope de variable pour les fonctions-------------------#
+def add_scope(env):
+    return {**env}
+
+#-------pour executer une fonction-------------------------------------------#
+def execute_function(func_name, call_args):
+    global env
+    if func_name in functions:
+        func_info = functions[func_name]
+        params = func_info["params"]
+        func_body = func_info["body"]
+        return_expr = func_info.get("return")
+
+        if len(params) == len(call_args):
+            func_env = add_scope(env)  # Create a new local environment
+            for param, arg in zip(params, call_args):
+                func_env[param] = evalExpr(arg, env)
+            execution_stack.append(func_name)  # Add to execution stack
+
+            print("Before function execution:")
+            print("Execution stack:", execution_stack)
+            print("Environment:", func_env)
+
+            evalInst(func_body, func_env)
+            execution_stack.pop()  # Remove from execution stack
+
+            print("After function execution:")
+            print("Execution stack:", execution_stack)
+            print("Environment:", func_env)
+
+            if return_expr:
+                return_value = evalExpr(return_expr, func_env)
+                return return_value
+        else:
+            print("Error: Number of arguments does not match number of function parameters '{}'. Expected: {}, Received: {}.".format(func_name, len(params), len(call_args)))
 
 
 #--------------------------------------------pour évaluer des variables----------------------------------------------------------------------------------#
@@ -106,7 +143,6 @@ def evalInst(t, env):
 
     instruction_type, *args = t
 
-    #debut d'un nouveau bloc d'instructions
     if instruction_type == "start":
         evalInst(args[0], env)
 
@@ -232,18 +268,9 @@ def evalInst(t, env):
         func_name = args[0]
         call_args = args[1] if len(args) > 1 else []  # appel sans arguments
         if func_name in functions:
-            func_info = functions[func_name]
-            params = func_info["params"]
-            func_body = func_info["body"]
-            return_expr = func_info.get("return")
-            if len(params) == len(call_args):
-                func_env = {param: evalExpr(arg, env) for param, arg in zip(params, call_args)} if call_args else {}
-                evalInst(func_body, func_env)
-                if return_expr:
-                    return_value = evalExpr(return_expr, func_env)  # Use func_env here
-                    print(f"- Function '{func_name}' returned: {return_value}")
-                    return return_value
-            else:
-                print("Error: Number of arguments does not match number of function parameters '{}'. Expected: {}, Received: {}.".format(func_name, len(params), len(call_args)))
-    else:
-        print("ERROR_EvalInst : Unexpected instruction type:", instruction_type)
+            return_value = execute_function(func_name, call_args)
+            if return_value is not None:
+                print(f"- Function '{func_name}' returned: {return_value}")
+                return return_value
+        else:
+            print("ERROR_EvalInst : Unexpected instruction type:", instruction_type)
