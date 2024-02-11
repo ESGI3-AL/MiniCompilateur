@@ -40,7 +40,7 @@ Mini interpréteur avec AST contenant:
 
 ### Affectation simples :
 
-s1 = "var=hello; x=4; print(x);"
+s1 = "y=hello; x=4; print(x); print(y);"
 
 s2 = "x=x+3; x=x-12; x=x*5; x=x/8;"
 

@@ -54,7 +54,12 @@ def eval_variable(t, env):
         return True
     elif t == "False":
         return False
-    return env.get(t, 0)
+    elif t in env:
+        return env[t]
+    elif isinstance(t, str):
+        return t
+    else:
+        return 0
 
 #--------------------------------------------pour évaluer des littéraux----------------------------------------------------------------------------------#
 def eval_literal(t):
@@ -125,6 +130,16 @@ def evalExpr(t, env):
     
     elif operator == "return":
         return evalExpr(t[1], env)
+    
+    operator = t[0]
+    if operator == 'array_access':
+        array_name, index = t[1:]
+        array = env.get(array_name, [])
+        if 0 <= index < len(array):
+            return array[index]
+        else:
+            print(f"Error: Array index out of range. Array '{array_name}' has size {len(array)}, but tried to access index {index}.")
+            return "UNKNOWN"
 
     else:
         print("Unexpected expression structure or operator:", t)
@@ -146,11 +161,53 @@ def evalInst(t, env):
     if instruction_type == "start":
         evalInst(args[0], env)
 
-    #assignations d'une valeur a une variable
+        # accès à un élément d'un tableau
+    elif instruction_type == "array_access":
+        array_name, index = args
+        array = env.get(array_name, [])
+        if 0 <= index < len(array):
+            value = array[index]
+            print(f"- Accessed element at index {index} of array '{array_name}': {value}")
+            return value
+        else:
+            print(f"Error: Array index out of range. Array '{array_name}' has size {len(array)}, but tried to access index {index}.")
+
+    # assignations d'une valeur a une variable ou à un tableau
     elif instruction_type == "=":
-        var_name, var_expr = args
-        env[var_name] = evalExpr(var_expr, env)
-        print(f"- Variable '{var_name}' updated to: {env[var_name]}")
+        target, expr = args
+        if isinstance(target, str):
+            env[target] = evalExpr(expr, env)
+            print(f"- Variable '{target}' updated to: {env[target]}")
+        elif isinstance(target, tuple) and target[0] == "array_access":
+            array_name, index = target[1:]
+            array = env.get(array_name, [])
+            if 0 <= index < len(array):
+                array[index] = evalExpr(expr, env)
+                env[array_name] = array
+                print(f"- Array '{array_name}' updated at index {index} to: {array[index]}")
+            else:
+                print(f"Error: Array index out of range. Array '{array_name}' has size {len(array)}, but tried to assign to index {index}.")
+
+    # création d'un tableau
+    elif instruction_type == "array_declaration":
+        array_name, size = args
+        env[array_name] = [0] * size
+        print(f"- Array '{array_name}' created with size {size}")
+
+    elif instruction_type == "array_assignment":
+        array_name, index, expr = args
+        array = env.get(array_name, [])
+        if 0 <= index < len(array):
+            array[index] = evalExpr(expr, env)
+            env[array_name] = array
+            print(f"- Array '{array_name}' updated at index {index} to: {array[index]}")
+        else:
+            print(f"Error: Array index out of range. Array '{array_name}' has size {len(array)}, but tried to assign to index {index}.")
+
+    elif instruction_type == "array":
+        array_name, values = args
+        env[array_name] = values
+        print(f"- Array '{array_name}' created with values {values}")
 
     #bloc d'instructions
     elif instruction_type == "node":
@@ -162,19 +219,24 @@ def evalInst(t, env):
             args = [args]
         results = []
         for expr in args:
-            if isinstance(expr, str):
-                #on verifie si expr = id de variable ou une chaine
+            if isinstance(expr, tuple):
+                if expr[0] == "array_access":
+                    array_name, index = expr[1:]
+                    array = env.get(array_name, [])
+                    if 0 <= index < len(array):
+                        value = array[index]
+                        results.append(value)
+                    else:
+                        print(f"Error: Array index out of range. Array '{array_name}' has size {len(array)}, but tried to access index {index}.")
+                else:
+                    evaluated_expr = evalExpr(expr, env)
+                    results.append(evaluated_expr)
+            elif isinstance(expr, str):
                 if expr in env:
-                    #si id on l'évalue pour avoir sa valeur
                     evaluated_expr = evalExpr(expr, env)
                     results.append(evaluated_expr)
                 else:
-                    #sinon on le traite comme chaine de caractères
                     results.append(expr.strip('"'))
-            elif isinstance(expr, tuple):
-                #si tuple on évalue expression
-                evaluated_expr = evalExpr(expr, env)
-                results.append(evaluated_expr)
             else:
                 results.append(expr)
         print("- CALC> ", ", ".join(map(str, results)))

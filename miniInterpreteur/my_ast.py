@@ -390,6 +390,10 @@ def p_array_assignment(t):
     "inst : ID LBRACKET expression RBRACKET EQUAL expression SEMICOLON"
     t[0] = ("array_assignment", t[1], t[3], t[6])
 
+def p_expression_array_access(t):
+    "expression : ID LBRACKET expression RBRACKET"
+    t[0] = ("array_access", t[1], t[3])
+
 
 # règle spéciale pour la gestion d'erreur
 def p_error(t):
@@ -428,7 +432,9 @@ s18 = "array tab[5, 2, 1];"
 
 s19 = "tab[0];"
 
-s20 = "tab[0] = 5;"
+s20 = "tab[0] = 6;"
+
+s25 = "print(tab[0]);"
 
 #-------------------scope des variables-------------------------------
 s21 = "function void toto(){x=5;}toto();"
