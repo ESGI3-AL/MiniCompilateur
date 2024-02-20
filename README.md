@@ -24,6 +24,10 @@ Mini interpréteur avec AST contenant:
     - affichage de l’arbre de syntaxe avec graphViz dans un dossier dedié
     -PrintMultiples
     -PrintString
+    -Pile d'éxécution (suivis de l'ordre des appels de fonction, fonction ajouté, son nom est ajouté a la pile, fonction terminé, nom retiré de la pile, donc on peut voir quelle fonction est en cours d'éxécution pour un moment donnée)
+    -return
+    -scope des variables
+    -tableau (affectation, print, init)
 
 ## Organisation projet
 - Structure du projet:
@@ -90,14 +94,24 @@ s15 = "function value toto(){x=5; return x;}toto();"
 ### fonction value avec paramètres et return :
 s16 = "function value toto(a,b){c=a+b ; return c;} toto(3, 5);"
 
-## Tableaux :
+## tableaux
 s17 = "array tab[];"
 
 s18 = "array tab[5, 2, 1];"
 
-s19 = "tab[0];"
+s20 = "tab[0] = 6;"
 
-s20 = "tab[0] = 5;"
+s25 = "print(tab[0]);"
+
+s30 = "print(tab[2]);"
+
+## scope des variables
+s21 = "function void toto(){x=5;}toto();"
+s22 = "function void toto(){x=5;}toto();print(x);" #doit renvoyer x car pas a l'interieur de la fonction
+s23 = "function void toto(){x=5;}toto();function void toto(){x=5;}toto();print(x);"
+
+## Pile d'execution
+s24 = "function void inner(){print(5);}function void outer(){ x=5;inner();}outer();"
 
 ---
 ## Informations Utiles

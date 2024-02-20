@@ -430,19 +430,20 @@ s17 = "array tab[];"
 
 s18 = "array tab[5, 2, 1];"
 
-s19 = "tab[0];"
-
 s20 = "tab[0] = 6;"
 
 s25 = "print(tab[0]);"
+
+s30 = "print(tab[2]);"
 
 #-------------------scope des variables-------------------------------
 s21 = "function void toto(){x=5;}toto();"
 s22 = "function void toto(){x=5;}toto();print(x);" #doit renvoyer x car pas a l'interieur de la fonction
 s23 = "function void toto(){x=5;}toto();function void toto(){x=5;}toto();print(x);"
 
-#----------------------Pile d'execution---------------------------------
+#----------------------Pile d'execution--------------------------------
 s24 = "function void inner(){print(5);}function void outer(){ x=5;inner();}outer();"
 
-# analyse et construit l'arbre syntaxique correspondant
+
+#analyse et construit l'arbre syntaxique correspondant
 parser.parse(s20)

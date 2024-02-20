@@ -5,7 +5,7 @@
 # ******************************************************************
 
 
-execution_stack = []
+execution_stack = [] #la pile d'execution est vide
 
 env = {}
 
@@ -16,6 +16,7 @@ def add_scope(env):
     return {**env}
 
 #-------pour executer une fonction-------------------------------------------#
+
 def execute_function(func_name, call_args):
     global env
     if func_name in functions:
@@ -25,17 +26,17 @@ def execute_function(func_name, call_args):
         return_expr = func_info.get("return")
 
         if len(params) == len(call_args):
-            func_env = add_scope(env)  # Create a new local environment
+            func_env = add_scope(env)  #On crée un nouvel envirionnement local pour la fonction en cours d'execution (Cet environnement est utilisé pour évaluer les expressions et les instructions à l'intérieur de la fonction)
             for param, arg in zip(params, call_args):
                 func_env[param] = evalExpr(arg, env)
-            execution_stack.append(func_name)  # Add to execution stack
+            execution_stack.append(func_name)  #On ajoute la pile, la fonction est en cours d'execution
 
             print("Before function execution:")
             print("Execution stack:", execution_stack)
             print("Environment:", func_env)
 
-            evalInst(func_body, func_env)
-            execution_stack.pop()  # Remove from execution stack
+            evalInst(func_body, func_env) #evaluation
+            execution_stack.pop()  #on l'enleve de la pile
 
             print("After function execution:")
             print("Execution stack:", execution_stack)
@@ -249,7 +250,7 @@ def evalInst(t, env):
                 evaluated_expr = evalExpr(expr, env)
                 results.append(evaluated_expr)
             elif isinstance(expr, str):
-                #si l'expression = chaîne, von verifie si variable ou chaine
+                #si l'expression = chaîne, on verifie si variable ou chaine
                 if expr in env:
                     #si = id, on évalue pour obtenir sa valeur
                     evaluated_expr = evalExpr(expr, env)
@@ -330,7 +331,7 @@ def evalInst(t, env):
         func_name = args[0]
         call_args = args[1] if len(args) > 1 else []  # appel sans arguments
         if func_name in functions:
-            return_value = execute_function(func_name, call_args)
+            return_value = execute_function(func_name, call_args) #lorsque une fonction est appelé, le nom de la fonction est ajouté à la pile d'éxécution
             if return_value is not None:
                 print(f"- Function '{func_name}' returned: {return_value}")
                 return return_value
